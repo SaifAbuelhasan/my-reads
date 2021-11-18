@@ -16,7 +16,7 @@ class Bookshelf extends Component {
                         books.map((book) => {
                             return(
                             <li key={book.id}>
-                                <Book book={book} />
+                                <Book book={book} onMove={this.props.moveToShelf}/>
                             </li>
                             )
                         })

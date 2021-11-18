@@ -14,9 +14,21 @@ class MainPage extends Component {
                 </div>
                 <div className="list-books-content">
                     
-                    <Bookshelf name='Currently Reading' books={books.filter((book) => (book.shelf === 'currentlyReading'))} />
-                    <Bookshelf name='Want To Read' books={books.filter((book) => (book.shelf === 'wantToRead'))} />
-                    <Bookshelf name='Read' books={books.filter((book) => (book.shelf === 'read'))} />
+                    <Bookshelf 
+                        name='Currently Reading' 
+                        books={books.filter((book) => (book.shelf === 'currentlyReading'))} 
+                        moveToShelf={this.props.moveToShelf}
+                    />
+                    <Bookshelf 
+                        name='Want To Read' 
+                        books={books.filter((book) => (book.shelf === 'wantToRead'))} 
+                        moveToShelf={this.props.moveToShelf}
+                    />
+                    <Bookshelf 
+                        name='Read' 
+                        books={books.filter((book) => (book.shelf === 'read'))} 
+                        moveToShelf={this.props.moveToShelf}
+                    />
                 </div>
                 <div className="open-search">
                     <Link className="open-search-button" to='/search'>Add a book</Link>

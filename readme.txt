@@ -9,3 +9,7 @@ Added API function in App to fetch all books
 Sent the books as prop to the MainPage component
 Created new components for each bookshelf
 Each Bookshelf component gets its corresponding books list via filtering the books prop
+
+Added change shelf functionality 
+When moveToShelf function is called the update function is called from booksAPI, and the books state in the App component is changed to suit the
+change 
