@@ -12,14 +12,14 @@ class Book extends Component {
         return(
             <div className="book">
                 <div className="book-top">
-                    {book.imageLinks.thumbnail 
+                    {book.imageLinks 
                     ?
                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                     :
                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${cover})` }}></div>
                     }
                     <div className="book-shelf-changer">
-                    <select value={book.shelf} onChange={(event) => {this.props.onMove(book, event.target.value)}}>
+                    <select value={book.shelf ? book.shelf : 'none'} onChange={(event) => {this.props.onMove(book, event.target.value)}}>
                         <option value="move" disabled>Move to...</option>
                         <option value="currentlyReading">Currently Reading</option>
                         <option value="wantToRead">Want to Read</option>
@@ -30,11 +30,12 @@ class Book extends Component {
                 </div>
                 <div className="book-title">{book.title}</div>
                 {
-                book.authors.map((author) => {
-                    return(
-                        <div className="book-authors" key={author}>{author}</div>
-                    )
-                })
+                    book.authors &&
+                    book.authors.map((author) => {
+                        return(
+                            <div className="book-authors" key={author}>{author}</div>
+                        )
+                    })
                 }
                 
             </div>       

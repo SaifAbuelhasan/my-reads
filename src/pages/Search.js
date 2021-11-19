@@ -1,33 +1,158 @@
-import React, { Component } from 'react';
-// import * as BooksAPI from './BooksAPI'
+import React from 'react';
+import * as BooksAPI from '../BooksAPI';
 import '../App.css';
 import { Link } from 'react-router-dom';
+import Book from '../components/book';
+import { useState } from 'react';
+import useConstant  from 'use-constant';
+import { useAsync } from 'react-async-hook';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 
-class Search extends Component {
-    render() {
-        return(
-            <div className="search-books">
-                <div className="search-books-bar">
-                <Link to='/' className="close-search" >Close</Link>
-                <div className="search-books-input-wrapper">
-                    {/*
-                    NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                    You can find these search terms here:
-                    https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
 
-                    However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                    you don't find a specific author or title. Every search is limited by search terms.
-                    */}
-                    <input type="text" placeholder="Search by title or author"/>
+// Earlier version of the code. Searching went fine as long as you didn't delete characters so fast.
+// It kind of broke due to too many api calls.
 
-                </div>
-                </div>
-                <div className="search-books-results">
-                <ol className="books-grid"></ol>
-                </div>
-            </div>
-        )
+/* export default function Search(props) {
+    const [query, setQuery] = useState('');
+    const [books, setBooks] = useState([]);
+    
+    const clearSearch = () => {
+        setBooks([]);
     }
-}
 
-export default Search;
+    const updateBooks = (books) => {
+        setBooks(books);
+    }
+
+    const search = (query) => {
+        if(query === '') {
+            clearSearch();
+            return;
+        }
+        BooksAPI.search(query)
+            .then((data) => {
+                if(data.error !== 'empty query') {
+                    updateBooks(data);
+                    console.log('updated for ', query);
+                }
+                else {
+                    console.log('updated for ', query);
+                    clearSearch()
+                }
+            })
+            .catch((e) => {
+                clearSearch();
+            })
+    }
+
+    const handleChange = (event) => {
+        const query = event.target.value;
+        
+        setQuery(query);
+        search(query);
+    }
+
+    return(
+        <div className="search-books">
+            <div className="search-books-bar">
+            <Link to='/' className="close-search" >Close</Link>
+            <div className="search-books-input-wrapper">
+                <input value={query} type="text" placeholder="Search by title or author" onChange={handleChange}/>
+
+            </div>
+            </div>
+            <div className="search-books-results">
+            <ol className="books-grid">
+                {
+                    books.map((book) => {
+                        return(
+                            <li key={book.id}>
+                                <Book book={book} onMove={props.moveToShelf}/>
+                            </li>
+                        )
+                    })
+                }
+            </ol>
+            </div>
+        </div>
+    )
+
+}
+ */
+
+
+/* 
+
+// useDebouncedSearch is a function I found on stackoverflow that solves the issue. Written by Sebastian Lorber.
+*/
+// Generic reusable hook
+const useDebouncedSearch = (searchFunction) => {
+
+    // Handle the input text state
+    const [inputText, setInputText] = useState('');
+  
+    // Debounce the original search async function
+    const debouncedSearchFunction = useConstant(() =>
+      AwesomeDebouncePromise(searchFunction, 100)
+    );
+    
+    // The async callback is run each time the text changes,
+    // but as the search function is debounced, it does not
+    // fire a new request on each keystroke
+    const searchResults = useAsync(
+      async () => {
+        if (inputText.length === 0) {
+          return [];
+        } else {
+          return debouncedSearchFunction(inputText);
+        }
+      },
+      [debouncedSearchFunction, inputText]
+    );
+  
+    // Return everything needed for the hook consumer
+    return {
+      inputText,
+      setInputText,
+      searchResults,
+    };
+};
+
+const searchBooks = () => useDebouncedSearch((query) => BooksAPI.search(query));
+
+export default function Search(props) {
+    const {inputText, setInputText, searchResults } = searchBooks();
+    return(
+        <div className="search-books">
+            <div className="search-books-bar">
+            <Link to='/' className="close-search" >Close</Link>
+            <div className="search-books-input-wrapper">
+                <input value={inputText} type="text" placeholder="Search by title or author" onChange={e => setInputText(e.target.value)}/>
+
+            </div>
+            </div>
+            <div className="search-books-results">
+            <ol className="books-grid">
+                {
+                    searchResults.result &&
+                    (
+                        
+                        searchResults.result.map((book) => {
+                            for(const shelfBook of props.shelfBooks) {
+                                if(book.id === shelfBook.id) {
+                                    book.shelf = shelfBook.shelf;
+                                }
+                            }
+                            return(
+                                <li key={book.id}>
+                                    <Book book={book} onMove={props.moveToShelf}/>
+                                </li>
+                            )
+                        })
+                    )
+                }
+            </ol>
+            </div>
+        </div>
+    )
+}

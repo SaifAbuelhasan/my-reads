@@ -10,25 +10,7 @@ class BooksApp extends React.Component {
   state = {
     books: [],
   }
-  
-  moveToShelf = (book, shelf) => {
-    BooksAPI.update(book, shelf)
-      .then(() => {
-        this.setState((prevState) => {
-          const books = prevState.books;
-          const index = books.indexOf(book);
-          return {
-            books: [
-              ...books.slice(0, index),
-              {...book, shelf: shelf},
-              ...books.slice(index+1)
-            ]
-          }
-        })
-      })
-  }
-
-  componentDidMount() {
+  getAllBooks = () => {
     BooksAPI.getAll()
       .then((books) => {
         this.setState(() => ({
@@ -36,13 +18,35 @@ class BooksApp extends React.Component {
         }))
       })
   }
+  moveToShelf = (book, shelf) => {
+    if(book.shelf) {
+      const books = [...this.state.books];
+      const index = books.indexOf(book);
+      books[index].shelf = shelf;
+      this.setState(() => ({
+        books
+      }))
+      BooksAPI.update(book, shelf);
+    } 
+    else {
+      BooksAPI.update(book, shelf)
+        .then(() => {
+          this.getAllBooks()
+        })
+    }
+    
+  }
+
+  componentDidMount() {
+    this.getAllBooks();
+  }
 
   render() {
     return (
       
         <Routes>
           <Route exact path='/' element={<MainPage books={this.state.books} moveToShelf={this.moveToShelf}/>}/>
-          <Route path='/search' element={<Search />} />
+          <Route path='/search' element={<Search moveToShelf={this.moveToShelf} shelfBooks={this.state.books}/>} />
         </Routes>
     )
   }
