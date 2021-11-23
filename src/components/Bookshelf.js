@@ -1,32 +1,29 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../App.css';
 import Book from '../components/book';
 
 
-class Bookshelf extends Component {
-    render() {
-        const name = this.props.name;
-        const books = this.props.books;
-        return(
-            <div className="bookshelf">
-                <h2 className="bookshelf-title">{name}</h2>
-                <div className="bookshelf-books">
-                <ol className="books-grid">
-                    {
-                        books.map((book) => {
-                            return(
-                            <li key={book.id}>
-                                <Book book={book} onMove={this.props.moveToShelf}/>
-                            </li>
-                            )
-                        })
-                    }
-                </ol>
-                </div>
-
+export default function Bookshelf(props) {
+    const name = props.name;
+    const books = props.books;
+    return(
+        <div className="bookshelf">
+            <h2 className="bookshelf-title">{name}</h2>
+            <div className="bookshelf-books">
+            <ol className="books-grid">
+                {
+                    books.map((book) => {
+                        return(
+                        <li key={book.id}>
+                            <Book book={book} onMove={props.moveToShelf}/>
+                        </li>
+                        )
+                    })
+                }
+            </ol>
             </div>
-        )
-    }
-}
 
-export default Bookshelf;
+        </div>
+    )
+
+}

@@ -11,8 +11,8 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
 
 // Earlier version of the code. Searching went fine as long as you didn't delete characters so fast.
 // It kind of broke due to too many api calls.
-
-/* export default function Search(props) {
+let debounceTimer;
+export default function Search(props) {
     const [query, setQuery] = useState('');
     const [books, setBooks] = useState([]);
     
@@ -24,7 +24,14 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
         setBooks(books);
     }
 
+    const debounce = (func, query, delay) => {
+        console.log('debouncing ', query)
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func(query), delay);
+    }
+
     const search = (query) => {
+        console.log('searching', query)
         if(query === '') {
             clearSearch();
             return;
@@ -33,10 +40,8 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
             .then((data) => {
                 if(data.error !== 'empty query') {
                     updateBooks(data);
-                    console.log('updated for ', query);
                 }
                 else {
-                    console.log('updated for ', query);
                     clearSearch()
                 }
             })
@@ -49,7 +54,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
         const query = event.target.value;
         
         setQuery(query);
-        search(query);
+        debounce(search, query, 550);
     }
 
     return(
@@ -58,7 +63,6 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
             <Link to='/' className="close-search" >Close</Link>
             <div className="search-books-input-wrapper">
                 <input value={query} type="text" placeholder="Search by title or author" onChange={handleChange}/>
-
             </div>
             </div>
             <div className="search-books-results">
@@ -78,13 +82,13 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
     )
 
 }
- */
 
 
+
+ 
 /* 
-
 // useDebouncedSearch is a function I found on stackoverflow that solves the issue. Written by Sebastian Lorber.
-*/
+
 // Generic reusable hook
 const useDebouncedSearch = (searchFunction) => {
 
@@ -134,9 +138,8 @@ export default function Search(props) {
             <div className="search-books-results">
             <ol className="books-grid">
                 {
-                    searchResults.result &&
+                    Array.isArray(searchResults.result) &&
                     (
-                        
                         searchResults.result.map((book) => {
                             for(const shelfBook of props.shelfBooks) {
                                 if(book.id === shelfBook.id) {
@@ -156,3 +159,4 @@ export default function Search(props) {
         </div>
     )
 }
+ */
